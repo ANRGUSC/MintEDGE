@@ -44,8 +44,7 @@ There are two main ways to run MintEDGE:
 1. **Linux (native install, recommended)**: you have to use Ubuntu/Debian based distribution.
 2. **macOS & Windows (Docker)**: use this one if you don't want to use Linux.
 
-### 1. Native installation in Linux (Recommended)
-MintEDGE has been tested with **Python 3.11.5**.
+### 1. Native installation in Linux
 
 #### 1.1 Clone the repository:
 
@@ -54,7 +53,32 @@ git clone https://github.com/blasf1/MintEDGE.git
 cd MintEDGE
 ```
 
-#### 1.2 Create a virtual environment (recommended):
+#### 1.2 Create a virtual environment:
+
+This project is tested with **Python 3.11.5**.
+
+If you don’t already manage Python versions, the simplest way to get 3.11
+without touching your system Python is to use [`pyenv`](https://github.com/pyenv/pyenv).
+
+1. Install pyenv (see pyenv docs for details / other install options)
+```bash
+curl https://pyenv.run | bash
+```
+
+2. Enable pyenv in your shell (add this to ~/.bashrc, ~/.zshrc, etc.)
+```bash
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - bash)"
+```
+
+3. Install Python 3.11.5 and select it for this project
+```bash
+pyenv install 3.11.5
+pyenv local 3.11.5
+````
+
+4. Create the virtual environment
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -77,7 +101,7 @@ Make sure the `sumo` binary is on your `PATH`:
 which sumo
 sumo --version
 ```
-If `sumo --version` prints a version number (e.g. `1.25.0`), you’re good.
+If `sumo --version` prints a version number (e.g. `1.24.0`), you’re good.
 
 ### 2. Windows and MacOS installation using Docker
 
