@@ -176,7 +176,7 @@ REACTIVE_ALLOCATION = False  # whether to allocate resources reactively
     - `False`: the orchestrator uses only current/observed load.
     - `True`: the orchestrator additionally uses a workload predictor (by default MintEDGE comes with an ideal predictor) to anticipate future load.
 
-- `MEASUREMENT_INTERVAL` (seconds): How often monitoring information is collected (e.g. load, rejected requests). Smaller values provide finer-grained monitoring at higher computational cost.
+- `MEASUREMENT_INTERVAL` (seconds): How often monitoring information is collected (e.g. load, rejected requests). Smaller values provide finer-grained monitoring at higher computational cost. ⚠️WARNING: AT THE MOMENT THIS ONLY WORKS FOR 1 SECOND. DO NOT CHANGE.
 
 - `ORCHESTRATOR_INTERVAL` (seconds): How often the orchestrator recomputes: the status of servers (on/off), the assignation matrix (where to send each request) and the allocation matrix (CPU share per service per server).
 
@@ -310,10 +310,8 @@ There are two levels here:
 
 - `CAR_SERVICES`:
 List of service names that vehicular users can request.
-
 - `PEDESTRIAN_SERVICES`:
 Services used by pedestrian users.
-
 - `STATIONARY_SERVICES`:
 Services used by stationary users (e.g. cameras, sensors).
 
@@ -340,23 +338,17 @@ For example:
 means:
 
 - Name: `"connected_vehicles"`
-
 - CPU demand: 14,000 operations per second per active request
-
 - Request arrival rate: 10 req/s on average
-
 - Input size: 1600 bytes (payload size from user to edge)
-
 - Output size: 100 bytes (response payload)
-
 - Delay budget: 0.005 seconds (5 ms)
 
 To add a new service, you would:
 
 1. Add a new Service(...) entry to SERVICES, e.g.:
 
-`Service("my_new_service", 40000, 2, 2_000, 500, 0.020),`
-
+  `Service("my_new_service", 40000, 2, 2_000, 500, 0.020),`
 
 2. Add "my_new_service" to one (or more) of: `CAR_SERVICES`, `PEDESTRIAN_SERVICES`, `STATIONARY_SERVICES` depending on which user types can request it.
 
