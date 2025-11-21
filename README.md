@@ -17,25 +17,20 @@ MintEDGE is a flexible edge computing simulation framework that allows the confi
 - Plug in **workload predictors** as part of your resource allocation strategy (an ideal predictor is provided by default).
 - We use the realistic and lightweight energy model from [LEAF](https://github.com/dos-group/leaf/)'s [4].
 
-<br>
 
 ## Orchestrator Operation and System Model (intuition)
 
 The orchestrator controls three core objects:
 
-- **Status vector**  
-  Indicates, for each Base Station (BS), whether it hosts an edge server and whether that server is currently active.
+- **Status vector**: Indicates, for each Base Station (BS), whether it hosts an edge server and whether that server is currently active.
 
-- **Assignation matrix**  
-  Describes where requests from each BS are processed.  
+- **Assignation matrix**: Describes where requests from each BS are processed.  
   Example: if BS *i* receives 4 requests of service *k* and 2 are handled at server *j* and 2 at server *m*, then the matrix entries for (i, k, j) and (i, k, m) are 0.5 each.
 
-- **Allocation matrix**  
-  Describes how CPU resources are divided among services on each server.
+- **Allocation matrix**: Describes how CPU resources are divided among services on each server.
 
 By changing these three, you implement different orchestration / energy-saving strategies. MintEDGE gives you a controlled environment to test them.
 
-<br>
 
 ## Installation
 
@@ -53,37 +48,16 @@ git clone https://github.com/blasf1/MintEDGE.git
 cd MintEDGE
 ```
 
-#### 1.2 Create a virtual environment:
+#### 1.2 Create a virtual environment (recommended):
 
-This project is tested with **Python 3.11.5** and might work with newer versions.
+MintEDGE has been tested with **Python 3.13**.
 
-If you don’t already manage Python versions, the simplest way to get 3.11
-without touching your system Python is to use [`pyenv`](https://github.com/pyenv/pyenv).
-
-1. Install pyenv (see pyenv docs for details / other install options)
-```bash
-curl https://pyenv.run | bash
-```
-
-2. Enable pyenv in your shell (add this to ~/.bashrc, ~/.zshrc, etc.)
-```bash
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - bash)"
-```
-
-3. Install Python 3.11.5 and select it for this project
-```bash
-pyenv install 3.11.5
-pyenv local 3.11.5
-````
-
-4. Create the virtual environment
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 You should now see (.venv) in your terminal prompt.
+
 
 #### 1.3 Install Python dependencies
 ```bash
@@ -123,7 +97,6 @@ Build the image (name it `mintedge`):
 docker build -t mintedge .
 ````
 
-<br>
 
 ## Usage
 
@@ -142,7 +115,6 @@ docker run --rm -v "$PWD:/app" mintedge \
 After the run, you should see `results.csv` (or whatever name you chose) appear in your MintEDGE folder on the host.
 You can adjust the simulation time, the seed and the output file in the command line. This facilitates launching multiple simulations simultaneously in distributed environments, e.g. a cluster with SLURM scheduler. More advanced settings about your scenario can be adjusted in the `settings.py` file
 
-<br>
 
 ## Project Structure
 
@@ -166,7 +138,6 @@ Python dependencies
 - `Dockerfile`:
 Docker definition for containerized runs (Linux SUMO inside).
 
-<br>
 
 ## Configuration
 MintEDGE is configured through the `settings.py` file at the root of the project. This file is regular Python; when you run `MintEDGE.py`, it imports `settings.py` and uses the values defined there.
@@ -376,9 +347,6 @@ To add a new service, you would:
 
 2. Add "my_new_service" to one (or more) of: `CAR_SERVICES`, `PEDESTRIAN_SERVICES`, `STATIONARY_SERVICES` depending on which user types can request it.
 
-<br>
-
-
 ## Writing your own resource allocation strategy
 
 MintEDGE is designed so that the **resource allocation strategy is a pluggable module**.
@@ -397,9 +365,6 @@ At each orchestration step (every `ORCHESTRATOR_INTERVAL` seconds, or earlier if
 By changing how these three objects are computed in `allocation_strategy.py`, you define a new resource allocation / energy-saving strategy.
 
 Inside you will find the default strategy implementation. This file contains the function (or class) that the orchestrator calls every `ORCHESTRATOR_INTERVAL`. Read the docstring and comments in this file first; they describe exactly what inputs you receive and what you must return.
-
-
-<br>
 
 ## How to contribute
 
