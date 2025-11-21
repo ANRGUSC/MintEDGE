@@ -187,9 +187,8 @@ class Simulation:
             MintEDGEError: If there are issues downloading or processing the OSM data.
         """
         print("Net file not provided, generating from OSM")
-        from distutils.spawn import find_executable
 
-        if find_executable("netconvert") is None:
+        if which("netconvert") is None:
             raise MintEDGEError("netconvert is not installed")
 
         # temp workspace (deleted on interpreter exit)

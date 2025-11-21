@@ -55,7 +55,7 @@ cd MintEDGE
 
 #### 1.2 Create a virtual environment:
 
-This project is tested with **Python 3.11.5**.
+This project is tested with **Python 3.11.5** and might work with newer versions.
 
 If you don’t already manage Python versions, the simplest way to get 3.11
 without touching your system Python is to use [`pyenv`](https://github.com/pyenv/pyenv).
