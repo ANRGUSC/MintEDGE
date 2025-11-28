@@ -1,4 +1,6 @@
-# MintEDGE
+<p align="left">
+<img src="https://github.com/user-attachments/assets/d12fb693-06be-40d3-99a5-e8ed53d0a451">
+</p>
 
 ![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)
 ![GitHub](https://img.shields.io/github/license/blasf1/MintEDGE)
