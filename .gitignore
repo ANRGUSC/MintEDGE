@@ -167,3 +167,4 @@ cache/
 *.xml
 *.pdf
 tests/
+maps/
