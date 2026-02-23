@@ -1,3 +1,102 @@
+## DAG Task Scheduling Simulation (Extension from the Original MintEDGE)
+
+This extension adds a standalone DAG-based task scheduling simulation on top of MintEDGE. It replays a pre-computed schedule (e.g. from HEFT or MCT) over a network topology, simulating each task's uplink → compute → downlink execution phases using SimPy, and measures the resulting makespan.
+
+### Input files
+
+Three JSON files are required:
+
+- **`dag.json`** — DAG structure: task compute costs, edges (successors), and edge weights (data sizes between tasks).
+- **`network_topology.json`** — Network topology: compute nodes (with speed multipliers and types) and links (with bandwidth and link type).
+- **`schedule_<scheduler>_<scenario>.json`** — Pre-computed schedule: task-to-node assignments with scheduled start/end times and a recorded makespan. Two schedulers are provided: HEFT and MCT.
+
+### Usage
+
+```bash
+python run_dag_simulation.py \
+  --dag dag.json \
+  --topology network_topology.json \
+  --schedule schedule_heft_7cells.json \
+  --output results/
+```
+
+Optional arguments:
+
+| Argument | Default | Description |
+|---|---|---|
+| `--dag` | `dag.json` | Path to DAG definition file |
+| `--topology` | `network_topology.json` | Path to network topology file |
+| `--schedule` | `schedule_heft_7cells.json` | Path to schedule file |
+| `--output` | *(none)* | Output directory for JSON and CSV results |
+| `--base-compute-speed` | `1.0` | Base compute speed for all nodes |
+
+After the run, the output directory (if specified) will contain:
+- `simulation_results.json` — Summary and per-task metrics in JSON format.
+- `task_metrics.csv` — Per-task timing breakdown (scheduled vs. actual, uplink / compute / downlink) in CSV format.
+
+### Sample output
+
+```
+Loaded 8 task definitions from dag.json
+Loaded 10 nodes and 65 links from network_topology.json
+Loaded 56 scheduled tasks from schedule_heft_7cells.json
+HEFT makespan: 12,418,046.67
+
+Running simulation...
+Simulation complete. Makespan: 12,370,925.10
+
+============================================================
+DAG SIMULATION RESULTS
+============================================================
+
+Tasks executed: 56
+
+MAKESPAN COMPARISON:
+  HEFT predicted:  12,418,046.67
+  Simulated:       12,370,925.10
+  Difference:      -47,121.57 (-0.38%)
+
+TIMING BREAKDOWN (cumulative across all tasks):
+  Total uplink time:   15.54
+  Total compute time:  85,336,521.67
+  Total downlink time: 0.00
+
+AVERAGE SCHEDULE DELTAS:
+  Start delta:    -251,098.67
+  End delta:      -256,588.29
+  Duration delta: -5,489.61
+
+============================================================
+
+VERIFICATION:
+  All task dependencies respected.
+  Timing breakdown sums correctly for all tasks.
+```
+
+### How the simulation works
+
+1. **Load** the DAG, topology, and schedule from the input files.
+2. **Build** a NetworkX graph of the network topology. Dijkstra's algorithm (weighted by inverse bandwidth) finds the shortest path between any two nodes.
+3. **Replay** the schedule in SimPy: each task waits for its predecessors to finish, transfers data from them (uplink), executes on its assigned node (compute), then signals completion.
+4. **Measure** the resulting makespan and compare it to the scheduler's predicted makespan. Dependency violations and timing consistency are verified automatically.
+
+Multi-cell tasks use the naming convention `T<n>_c<cell>` (e.g. `T0_c6`), where each task instance is matched to its same-cell predecessors.
+
+### Module structure
+
+```
+mintedge/dag/
+├── models.py       # TaskDefinition, ScheduledTask, ComputeNode, NetworkLink dataclasses
+├── loaders.py      # JSON parsers for dag.json, topology, and schedule files
+├── topology.py     # DAGTopology: NetworkX graph with Dijkstra path finding and delay calculation
+├── scheduler.py    # DAGScheduler: SimPy process that replays the schedule
+├── metrics.py      # MetricsCollector: per-task timing metrics, JSON/CSV export
+└── simulation.py   # DAGSimulation: orchestrates load → setup → run → export
+```
+
+---
+
+
 <p align="left">
   <img src="https://private-user-images.githubusercontent.com/16418104/520178411-88eb652d-049e-48e4-af4a-7c2a9423b74b.svg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njg0OTIyNTIsIm5iZiI6MTc2ODQ5MTk1MiwicGF0aCI6Ii8xNjQxODEwNC81MjAxNzg0MTEtODhlYjY1MmQtMDQ5ZS00OGU0LWFmNGEtN2MyYTk0MjNiNzRiLnN2Zz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAxMTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMTE1VDE1NDU1MlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTBkMWQ4ZjY5YjhkMzg1NDU0ZmJmZDk1ODNjNzQwYTMzZmMwMzY3YTA4OGEzY2EzNTMxZTE0N2Y4MTVhZmU0MTYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.EBTTaEq533FI2fpRPU4EW6qvgQdYKBGgYwXQuYnA3xQ#gh-light-mode-only" />
   <img src="https://github.com/user-attachments/assets/d12fb693-06be-40d3-99a5-e8ed53d0a451#gh-dark-mode-only" />
